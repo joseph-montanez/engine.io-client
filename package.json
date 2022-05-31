@@ -74,6 +74,12 @@
     "zuul-builder-webpack": "^1.2.0",
     "zuul-ngrok": "4.0.0"
   },
+  "overrides": {
+    "zuul-ngrok": {
+      ".": "4.0.0",
+      "ngrok": "4.3.1"
+    }
+  },
   "scripts": {
     "compile": "rimraf ./build && tsc && tsc -p tsconfig.esm.json && ./postcompile.sh",
     "test": "npm run format:check && npm run compile && if test \"$BROWSERS\" = \"1\" ; then npm run test:browser; else npm run test:node; fi",
