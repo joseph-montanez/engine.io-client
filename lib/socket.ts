@@ -912,10 +912,14 @@ export class Socket extends Emitter<{}, {}, SocketReservedEvents> {
       this.transport.removeAllListeners();
 
       if (typeof removeEventListener === "function") {
-        try { 
+        try {
           removeEventListener("offline", this.offlineEventListener, false);
-        } catch(e) {
-          console.log('Cordova - Unable to remove listener', this.offlineEventListener, e);
+        } catch (e) {
+          console.log(
+            "Cordova - Unable to remove listener",
+            this.offlineEventListener,
+            e
+          );
         }
       }
 
