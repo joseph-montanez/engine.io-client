@@ -105,6 +105,7 @@
   },
   "files": [
     "build/",
-    "dist/"
+    "dist/",
+    "lib/"
   ]
 }
