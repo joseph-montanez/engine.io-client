@@ -12,17 +12,11 @@
   function _typeof(obj) {
     "@babel/helpers - typeof";
 
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function (obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof(obj);
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof(obj);
   }
 
   function _classCallCheck(instance, Constructor) {
@@ -44,11 +38,14 @@
   function _createClass(Constructor, protoProps, staticProps) {
     if (protoProps) _defineProperties(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
     return Constructor;
   }
 
   function _extends() {
-    _extends = Object.assign || function (target) {
+    _extends = Object.assign ? Object.assign.bind() : function (target) {
       for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i];
 
@@ -61,7 +58,6 @@
 
       return target;
     };
-
     return _extends.apply(this, arguments);
   }
 
@@ -77,22 +73,24 @@
         configurable: true
       }
     });
+    Object.defineProperty(subClass, "prototype", {
+      writable: false
+    });
     if (superClass) _setPrototypeOf(subClass, superClass);
   }
 
   function _getPrototypeOf(o) {
-    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) {
       return o.__proto__ || Object.getPrototypeOf(o);
     };
     return _getPrototypeOf(o);
   }
 
   function _setPrototypeOf(o, p) {
-    _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) {
       o.__proto__ = p;
       return o;
     };
-
     return _setPrototypeOf(o, p);
   }
 
@@ -102,7 +100,7 @@
     if (typeof Proxy === "function") return true;
 
     try {
-      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
       return true;
     } catch (e) {
       return false;
@@ -111,7 +109,7 @@
 
   function _construct(Parent, args, Class) {
     if (_isNativeReflectConstruct()) {
-      _construct = Reflect.construct;
+      _construct = Reflect.construct.bind();
     } else {
       _construct = function _construct(Parent, args, Class) {
         var a = [null];
@@ -175,6 +173,8 @@
   function _possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
     }
 
     return _assertThisInitialized(self);
@@ -208,9 +208,9 @@
     return object;
   }
 
-  function _get(target, property, receiver) {
+  function _get() {
     if (typeof Reflect !== "undefined" && Reflect.get) {
-      _get = Reflect.get;
+      _get = Reflect.get.bind();
     } else {
       _get = function _get(target, property, receiver) {
         var base = _superPropBase(target, property);
@@ -219,14 +219,14 @@
         var desc = Object.getOwnPropertyDescriptor(base, property);
 
         if (desc.get) {
-          return desc.get.call(receiver);
+          return desc.get.call(arguments.length < 3 ? target : receiver);
         }
 
         return desc.value;
       };
     }
 
-    return _get(target, property, receiver || target);
+    return _get.apply(this, arguments);
   }
 
   var PACKET_TYPES = Object.create(null); // no Map = no polyfill
@@ -287,11 +287,6 @@
     return fileReader.readAsDataURL(data);
   };
 
-  /*
-   * base64-arraybuffer 1.0.1 <https://github.com/niklasvh/base64-arraybuffer>
-   * Copyright (c) 2022 Niklas von Hertzen <https://hertzen.com>
-   * Released under MIT License
-   */
   var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'; // Use a lookup table to find the index.
 
   var lookup = typeof Uint8Array === 'undefined' ? [] : new Uint8Array(256);
@@ -299,7 +294,6 @@
   for (var i$1 = 0; i$1 < chars.length; i$1++) {
     lookup[chars.charCodeAt(i$1)] = i$1;
   }
-
   var decode$1 = function decode(base64) {
     var bufferLength = base64.length * 0.75,
         len = base64.length,
@@ -677,7 +671,7 @@
       return _this;
     }
 
-    return TransportError;
+    return _createClass(TransportError);
   }( /*#__PURE__*/_wrapNativeSuper(Error));
 
   var Transport = /*#__PURE__*/function (_Emitter) {
@@ -992,14 +986,19 @@
 
 
     _createClass(Polling, [{
-      key: "doOpen",
-
+      key: "name",
+      get: function get() {
+        return "polling";
+      }
       /**
        * Opens the socket (triggers polling). We write a PING message to determine
        * when the transport is open.
        *
        * @api private
        */
+
+    }, {
+      key: "doOpen",
       value: function doOpen() {
         this.poll();
       }
@@ -1233,11 +1232,6 @@
           _this7.onError("xhr poll error", xhrStatus, context);
         });
         this.pollXhr = req;
-      }
-    }, {
-      key: "name",
-      get: function get() {
-        return "polling";
       }
     }]);
 
@@ -1496,13 +1490,18 @@
 
 
     _createClass(WS, [{
-      key: "doOpen",
-
+      key: "name",
+      get: function get() {
+        return "websocket";
+      }
       /**
        * Opens socket.
        *
        * @api private
        */
+
+    }, {
+      key: "doOpen",
       value: function doOpen() {
         if (!this.check()) {
           // let probe timeout
@@ -1665,11 +1664,6 @@
       key: "check",
       value: function check() {
         return !!WebSocket;
-      }
-    }, {
-      key: "name",
-      get: function get() {
-        return "websocket";
       }
     }]);
 
@@ -2383,7 +2377,11 @@
           this.transport.removeAllListeners();
 
           if (typeof removeEventListener === "function") {
-            removeEventListener("offline", this.offlineEventListener, false);
+            try {
+              removeEventListener("offline", this.offlineEventListener, false);
+            } catch (e) {
+              console.log('Cordova - Unable to remove listener', this.offlineEventListener, e);
+            }
           } // set ready state
 
 
